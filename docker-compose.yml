@@ -1,0 +1,77 @@
+version: '3'
+services:
+
+  traefik:
+    image: traefik
+    command: -c /dev/null --web --docker
+    labels:
+      - "traefik.enable=false"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  eureka-server:
+    image: microservices-demo/eureka-server
+    labels:
+      - "traefik.port=8761" 
+      - "traefik.beckend=eureka-server"
+      - "traefik.frontend.rule=PathPrefixStrip:/eureka-server"
+    depends_on:
+      - traefik
+
+  zuul:
+    image: microservices-demo/zuul
+    labels:
+      - "traefik.port=8080" 
+      - "traefik.beckend=zuul"
+      - "traefik.frontend.rule=PathPrefixStrip:/zuul"
+    depends_on:
+      - traefik
+      - eureka-server
+    links:
+      - eureka-server
+
+  gateway:
+    image: microservices-demo/gateway 
+    labels:
+      - "traefik.enable=false"
+    depends_on:
+      - traefik
+      - eureka-server
+      - zuul
+    links:
+      - eureka-server
+
+  dummy-app:
+    image: microservices-demo/dummy-app
+    labels:
+      - "traefik.enable=false"
+    depends_on:
+      - traefik
+      - eureka-server
+      - zuul
+    links:
+      - eureka-server
+
+  dummy-app-with-db:
+    image: microservices-demo/dummy-app-with-db
+    labels:
+      - "traefik.enable=false"
+    depends_on:
+      - traefik
+      - eureka-server
+      - zuul
+      - postgres
+    links:
+      - eureka-server
+      - postgres
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: docker-test
