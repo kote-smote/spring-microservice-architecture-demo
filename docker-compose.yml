@@ -44,6 +44,17 @@ services:
     links:
       - eureka-server
 
+  login:
+    image: microservices-demo/login
+    labels:
+      - "traefik.enable=false"
+    depends_on:
+      - traefik
+      - eureka-server
+      - zuul
+    links:
+      - eureka-server
+
   dummy-app:
     image: microservices-demo/dummy-app
     labels:

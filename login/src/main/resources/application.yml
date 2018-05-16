@@ -1,0 +1,22 @@
+# JWT properties
+jwt:
+  secret: MartinSecretKeyToGenJWTs
+  expirationTime: 864_000_000 # 10 days
+  tokenPrefix: "Bearer "
+  headerString: Authorization
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+    healthcheck:
+      enabled: false
+  appInfo:
+    replicate:
+      interval: 3
+    initial:
+      replicate:
+        time: 3
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2

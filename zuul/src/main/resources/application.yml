@@ -20,7 +20,12 @@ eureka:
 zuul:
   ignored-services: '*'
   routes:
-    gateway: /gateway/**
+    gateway:
+      path: /gateway/**
+      sensitive-headers:
+    login: 
+      path: /login/**
+      sensitive-headers:
 
 management:
   security:
